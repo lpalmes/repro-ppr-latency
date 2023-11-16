@@ -30,7 +30,7 @@ export default async function BlockPage({
 
 function BlockSkeleton() {
   return (
-    <div className="w-20 h-20 flex justify-center items-center bg-orange-400 rounded-md">
+    <div className="w-80 h-80 flex justify-center items-center bg-orange-400 rounded-md">
       <span>Loading</span>
     </div>
   );
@@ -38,12 +38,20 @@ function BlockSkeleton() {
 
 async function Block(props: { number: number }) {
   await sleep(2000); // wait for two seconds
-  await sleep(props.number * 100); // and add some afterwards
+  const secret = await fetchSecret();
   return (
-    <div className="w-20 h-20 flex justify-center items-center bg-orange-400 rounded-md">
-      <span>Block {props.number}</span>
+    <div className="w-80 h-80 flex justify-center items-center bg-orange-400 rounded-md">
+      <span>{secret}</span>
     </div>
   );
+}
+
+async function fetchSecret() {
+  const res = await fetch("https://generate-secret.vercel.app/32", {
+    cache: "no-store",
+  });
+  const text = await res.text();
+  return text;
 }
 
 async function sleep(ms: number) {
