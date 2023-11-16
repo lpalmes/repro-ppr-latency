@@ -1,26 +1,35 @@
+import { fetchQuery, graphql } from "@/lib/graphql";
 import { Suspense } from "react";
-
-async function fetchListOfNumbers(n: number) {
-  // simulate network fetch
-  await sleep(200);
-
-  return Array.from(Array(n).keys());
-}
 
 export default async function BlockPage({
   params,
 }: {
   params: { blocks: string };
 }) {
-  const listOfNumbers = await fetchListOfNumbers(parseInt(params.blocks, 10));
+  const data = await fetchQuery(
+    graphql`
+      query samplePokeAPIquery($limit: Int!) {
+        pokemon_v2_pokemon(limit: $limit) {
+          id
+        }
+      }
+    `,
+    {
+      limit: parseInt(params.blocks),
+    },
+    {
+      revalidate: 30,
+    }
+  );
+
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
       <h1>PPR Repro</h1>
 
       <div className="grid grid-cols-3 gap-4 mt-5">
-        {listOfNumbers.map((num) => (
-          <Suspense fallback={<BlockSkeleton />} key={num}>
-            <Block number={num} />
+        {data.pokemon_v2_pokemon.map((pokemon: any) => (
+          <Suspense fallback={<BlockSkeleton />} key={pokemon.id}>
+            <Block id={pokemon.id} />
           </Suspense>
         ))}
       </div>
@@ -36,22 +45,27 @@ function BlockSkeleton() {
   );
 }
 
-async function Block(props: { number: number }) {
+async function Block(props: { id: number }) {
   await sleep(2000); // wait for two seconds
-  const secret = await fetchSecret();
+  const data = await fetchQuery(
+    graphql`
+      query pokemonQuery($id: Int!) {
+        pokemon_v2_pokemon_by_pk(id: $id) {
+          id
+          name
+        }
+      }
+    `,
+    { id: props.id },
+    { revalidate: 30 }
+  );
+
+  const pokemon = data.pokemon_v2_pokemon_by_pk;
   return (
     <div className="w-80 h-80 flex justify-center items-center bg-orange-400 rounded-md">
-      <span>{secret}</span>
+      <span>{pokemon.name}</span>
     </div>
   );
-}
-
-async function fetchSecret() {
-  const res = await fetch("https://generate-secret.vercel.app/32", {
-    cache: "no-store",
-  });
-  const text = await res.text();
-  return text;
 }
 
 async function sleep(ms: number) {
