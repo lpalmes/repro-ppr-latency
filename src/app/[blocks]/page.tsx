@@ -57,7 +57,8 @@ async function Block(props: { id: number }) {
       }
     `,
     { id: props.id },
-    { revalidate: 30 }
+    {},
+    "no-store"
   );
 
   const pokemon = data.pokemon_v2_pokemon_by_pk;

@@ -7,10 +7,10 @@ export default async function Home() {
 
       <ul className="mt-4 list-disc">
         <li>
-          <Link href="/6">Try loading 6 blocks</Link>
+          <Link href="/6">Try loading 6 pokemons</Link>
         </li>
         <li>
-          <Link href="/12">Try loading 12 blocks</Link>
+          <Link href="/12">Try loading 12 pokemons</Link>
         </li>
         <li>
           <Link href="/24">Why not 24?</Link>
