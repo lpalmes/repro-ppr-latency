@@ -1,5 +1,6 @@
 import { fetchQuery, graphql } from "@/lib/graphql";
 import { Suspense } from "react";
+import { cookies } from "next/headers";
 
 export default async function BlockPage({
   params,
@@ -47,6 +48,7 @@ function BlockSkeleton() {
 
 async function Block(props: { id: number }) {
   await sleep(2000); // wait for two seconds
+  cookies();
   const data = await fetchQuery(
     graphql`
       query pokemonQuery($id: Int!) {
